@@ -19,14 +19,9 @@
           0
           (inc (apply max $)))))
 
-
 (defn rock?
   [cave point]
   (= (get-in cave [:rocks point]) "#"))
-
-(defn current-rock?
-  [cave point]
-  (= (get-in cave [:rocks point]) "@"))
 
 (defn free?
   [cave [x y]]
@@ -45,7 +40,7 @@
   [cave]
   (as-> (for [y (range (max 15 (+ (get-height cave) 5)))
               x (range 7)]
-          (get-in cave [:rocks [x y]] ".")) $
+          (get-in cave [:rocks [x y]] " ")) $
         (partition 7 $)
         (reverse $)
         (map #(apply str %) $)
@@ -121,21 +116,52 @@
           (update :rock-count inc)
           (spawn-rock)))))
 
+
+
+(defn floor?
+  [cave y]
+  (->> cave
+       (:rocks)
+       (filter #(= (second (first %)) y))
+       (filter #(= (second %) "#"))
+       (count)
+       (= 7)))
+
+(defn find-floor
+  [cave]
+  (let [height (get-height cave)]
+    (as-> (range (- height 100) height) $
+          (filter #(floor? cave %) $)
+          (if (empty? $)
+            0
+            (apply max $)))))
+
+(defn truncate-cave
+  [cave]
+  (let [floor (find-floor cave)]
+    (cond
+      (zero? floor) cave
+      (pos? (mod (:rock-count cave) 10)) cave
+      :else (-> cave
+                (update :rocks
+                        (fn [rocks]
+                          (into {} (remove #(<= (second (first %)) floor) rocks))))))))
+
 (defn update-cave
   [cave]
   (-> cave
       (push-rock)
-      (drop-rock)))
+      (drop-rock)
+      (truncate-cave)))
 
-(def cave (-> {:jet        (first (read-input))
-               :queue      '(:line :cross :corner :column :square)
-               :rocks      {}
-               :rock-count 0}))
+(def cave (-> {:jet              (first (read-input))
+               :queue            '(:line :cross :corner :column :square)
+               :rocks            {}
+               :rock-count       0
+               :truncated-height 0}))
 
-(def final-cave (->> cave
-                     (spawn-rock)
-                     (iterate update-cave)
-                     (take-while #(<= (:rock-count %) 2022))
-                     (last)))                               ; ~3 mins
-
-(get-height final-cave)
+(time (def final-cave (->> cave
+                           (spawn-rock)
+                           (iterate update-cave)
+                           (take-while #(<= (:rock-count %) 300))
+                           (last))))                        ; ~3 mins
