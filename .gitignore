@@ -2,3 +2,4 @@
 .idea/
 .nrepl-port
 advent-of-code.iml
+**/test.txt
