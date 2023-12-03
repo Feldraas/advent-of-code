@@ -8,11 +8,12 @@
     (Integer/parseInt s)))
 
 (defn read-input
-  [filename]
+  [& [test]]
   (let [path (as-> (str *ns*) $
                    (str/split $ #"\.")
-                   (first $)
-                   (str $ "/inputs/" filename))]
+                   (str (first $) "/inputs/" (if (nil? test)
+                                               (last $)
+                                               "test") ".txt"))]
     (->> (with-open [rdr (io/reader path)]
            (mapv str (line-seq rdr))))))
 
