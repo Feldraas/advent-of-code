@@ -1,16 +1,9 @@
 (ns aoc23.src.day3
   (:require [utils :refer [read-input
-                           get-adjacent
                            parse-int]]))
 
-(def schematic (-> (read-input)))
+(def schematic (read-input))
 (def borders [(count schematic) (count (first schematic))])
-
-(defn parse-char
-  [c]
-  (if (<= 48 (int c) 57)
-    (str (- (int c) 48))
-    (str c)))
 
 (defn intstring?
   [s]
@@ -29,7 +22,7 @@
 (def raw-grid
   (as-> (for [x (range (first borders))
               y (range (second borders))
-              :let [c (parse-char (nth (nth schematic x) y))]
+              :let [c (str (nth (nth schematic x) y))]
               :when (not= c ".")]
           [[x y] c]) res
         (into {} res)))
