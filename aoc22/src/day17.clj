@@ -1,7 +1,5 @@
 (ns aoc22.src.day17
-  (:require [utils :refer [read-input
-                           in?]]
-            [clojure.string :as str]))
+  (:require [utils :refer [read-input]]))
 
 (defn rotate
   [object]
@@ -14,6 +12,8 @@
   [cave]
   (as-> cave $
         (:rocks $)
+        (remove #(= (second %) "@") $)
+        (keys $)
         (map second $)
         (if (empty? $)
           0
@@ -22,11 +22,11 @@
 
 (defn rock?
   [cave point]
-  (in? (:rocks cave) point))
+  (= (get-in cave [:rocks point]) "#"))
 
 (defn current-rock?
   [cave point]
-  (in? (:current-rock cave) point))
+  (= (get-in cave [:rocks point]) "@"))
 
 (defn free?
   [cave [x y]]
@@ -34,7 +34,7 @@
     (neg? x) false
     (>= x 7) false
     (neg? y) false
-    (in? (:rocks cave) [x y]) false
+    (rock? cave [x y]) false
     :else true))
 
 (defn valid?
@@ -45,10 +45,7 @@
   [cave]
   (as-> (for [y (range (max 15 (+ (get-height cave) 5)))
               x (range 7)]
-          (cond
-            (rock? cave [x y]) "#"
-            (current-rock? cave [x y]) "@"
-            :else ".")) $
+          (get-in cave [:rocks [x y]] ".")) $
         (partition 7 $)
         (reverse $)
         (map #(apply str %) $)
@@ -64,6 +61,22 @@
     :column [[x y] [x (+ y 1)] [x (+ y 2)] [x (+ y 3)]]
     :square [[x y] [(+ x 1) y] [x (+ y 1)] [(+ x 1) (+ y 1)]]))
 
+(defn get-current-rock
+  [cave]
+  (->> (:rocks cave)
+       (filter #(= (second %) "@"))
+       (map first)))
+
+(defn remove-current-rock
+  [cave]
+  (reduce #(update %1 :rocks dissoc %2) cave (get-current-rock cave)))
+
+(defn update-current-rock
+  [cave rock]
+  (as-> cave $
+        (remove-current-rock $)
+        (reduce #(assoc-in %1 [:rocks %2] "@") $ rock)))
+
 (defn spawn-rock
   ([cave]
    (-> cave
@@ -71,7 +84,7 @@
        (update :queue rotate)))
   ([cave rock-type]
    (let [edge [2 (+ 3 (get-height cave))]]
-     (assoc cave :current-rock (create-rock edge rock-type)))))
+     (update-current-rock cave (create-rock edge rock-type)))))
 
 (defn push
   [[x y] direction]
@@ -88,19 +101,23 @@
   (let [push-fn (if (= (first (:jet cave)) \>)
                   #(push % :right)
                   #(push % :left))
-        new-rock (map push-fn (:current-rock cave))
+        new-rock (map push-fn (get-current-rock cave))
         new-cave (update cave :jet rotate)]
     (if (valid? new-cave new-rock)
-      (assoc new-cave :current-rock new-rock)
+      (update-current-rock new-cave new-rock)
       new-cave)))
+
+(defn stop-current-rock
+  [cave]
+  (assoc cave :rocks (zipmap (keys (:rocks cave)) (repeat "#"))))
 
 (defn drop-rock
   [cave]
-  (let [new-rock (map drop-one-step (:current-rock cave))]
+  (let [new-rock (map drop-one-step (get-current-rock cave))]
     (if (valid? cave new-rock)
-      (assoc cave :current-rock new-rock)
+      (update-current-rock cave new-rock)
       (-> cave
-          (update :rocks concat (:current-rock cave))
+          (stop-current-rock)
           (update :rock-count inc)
           (spawn-rock)))))
 
@@ -110,13 +127,15 @@
       (push-rock)
       (drop-rock)))
 
-(def cave (-> {:jet          (first (read-input :test))
-               :queue        '(:line :cross :corner :column :square)
-               :current-rock []
-               :rocks        []
-               :rock-count   0}
-              (spawn-rock)))
+(def cave (-> {:jet        (first (read-input))
+               :queue      '(:line :cross :corner :column :square)
+               :rocks      {}
+               :rock-count 0}))
 
-;(take-while #(< (:rock-count %) 2021) (iterate update-cave cave))
-(-> (nth (iterate update-cave cave) 1000)
-    (draw-cave))
+(def final-cave (->> cave
+                     (spawn-rock)
+                     (iterate update-cave)
+                     (take-while #(<= (:rock-count %) 2022))
+                     (last)))                               ; ~3 mins
+
+(get-height final-cave)
