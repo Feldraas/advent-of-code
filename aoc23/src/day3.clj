@@ -5,6 +5,14 @@
 (def schematic (read-input))
 (def borders [(count schematic) (count (first schematic))])
 
+(def raw-grid
+  (as-> (for [x (range (first borders))
+              y (range (second borders))
+              :let [c (str (nth (nth schematic x) y))]
+              :when (not= c ".")]
+          [[x y] c]) res
+        (into {} res)))
+
 (defn intstring?
   [s]
   (re-seq #"^\d+$" (str s)))
@@ -19,22 +27,12 @@
           (assoc [x (dec y)] (str left this)))
       grid)))
 
-(def raw-grid
-  (as-> (for [x (range (first borders))
-              y (range (second borders))
-              :let [c (str (nth (nth schematic x) y))]
-              :when (not= c ".")]
-          [[x y] c]) res
-        (into {} res)))
-
 (def merged-grid
   (let [coords (->> raw-grid
                     (filter #(intstring? (second %)))
                     (keys)
                     (sort-by (juxt first #(- (second %)))))]
     (reduce merge-left raw-grid coords)))
-
-
 
 (defn get-neighbors
   [grid [x y] length]
@@ -65,7 +63,6 @@
     (if (intstring? right)
       (str this (read-right grid [x (inc y)]))
       this)))
-
 
 (defn read-number
   [grid [x y]]
@@ -98,6 +95,5 @@
 
 (->> (keys raw-grid)
      (filter #(gear? raw-grid %))
-     (sort)
      (map #(gear-ratio raw-grid %))
      (apply +))
