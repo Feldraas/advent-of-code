@@ -22,15 +22,10 @@
   [coll elm]
   (some #(= elm %) coll))
 
-
-;(->> (with-open [rdr (io/reader "aoc22")]
-;       (mapv str (line-seq rdr))))
-
-(defn testfn
-  []
-  (str *ns*))
-
-(def a "aoc22.src.day1")
-
-(-> a
-    (str/split #"\."))
+(defn get-adjacent
+  [[x y] n]
+  (case n
+    4 (list [(inc x) y] [(dec x) y] [x (inc y)] [x (dec y)])
+    5 (conj (get-adjacent [x y] 4) [x y])
+    8 (concat (get-adjacent [x y] 4) [[(inc x) (inc y)] [(inc x) (dec y)] [(dec x) (inc y)] [(dec x) (dec y)]])
+    9 (conj (get-adjacent [x y] 8) [x y])))
