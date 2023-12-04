@@ -8,12 +8,12 @@
     (Integer/parseInt s)))
 
 (defn read-input
-  [& [test]]
+  [& [file]]
   (let [path (as-> (str *ns*) $
                    (str/split $ #"\.")
-                   (str (first $) "/inputs/" (if (nil? test)
+                   (str (first $) "/inputs/" (if (nil? file)
                                                (last $)
-                                               "test") ".txt"))]
+                                               (name file)) ".txt"))]
     (->> (with-open [rdr (io/reader path)]
            (mapv str (line-seq rdr))))))
 
@@ -29,3 +29,11 @@
     5 (conj (get-adjacent [x y] 4) [x y])
     8 (concat (get-adjacent [x y] 4) [[(inc x) (inc y)] [(inc x) (dec y)] [(dec x) (inc y)] [(dec x) (dec y)]])
     9 (conj (get-adjacent [x y] 8) [x y])))
+
+(defn non-neg?
+  [x]
+  (>= x 0))
+
+(defn non-pos?
+  [x]
+  (<= x 0))
