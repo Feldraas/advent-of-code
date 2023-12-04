@@ -1,6 +1,5 @@
 (ns aoc23.src.day3
-  (:require [utils :refer [read-input
-                           parse-int]]))
+  (:require [utils :refer [read-input parse-int]]))
 
 (def schematic (read-input))
 (def borders [(count schematic) (count (first schematic))])
@@ -55,6 +54,8 @@
      (map second)
      (map parse-int)
      (apply +))
+
+; Part 2
 
 (defn read-right
   [grid [x y]]
