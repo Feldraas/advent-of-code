@@ -38,6 +38,6 @@
     (reduce #(update %1 %2 + (get %1 n)) copies cards-to-add)))
 
 (as-> copies $
-      (reduce #(process-card %1 %2) $ (sort (keys $)))
+      (reduce process-card $ (sort (keys $)))
       (vals $)
       (apply + $))
