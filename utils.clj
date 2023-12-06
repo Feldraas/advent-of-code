@@ -8,12 +8,14 @@
     (Integer/parseInt s)))
 
 (defn read-input
-  [& [file]]
-  (let [path (as-> (str *ns*) $
-                   (str/split $ #"\.")
-                   (str (first $) "/inputs/" (if (nil? file)
-                                               (last $)
-                                               (name file)) ".txt"))]
+  [& [arg]]
+  (let [[year _ day] (-> (str *ns*)
+                         (str/split #"\."))
+        file (cond
+               (nil? arg) (str day ".txt")
+               (= arg :test) (str day ".ex")
+               :else (str (name arg) ".txt"))
+        path (str year "/inputs/" file)]
     (->> (with-open [rdr (io/reader path)]
            (mapv str (line-seq rdr))))))
 
@@ -37,3 +39,12 @@
 (defn non-pos?
   [x]
   (<= x 0))
+
+(defn nmap
+  ([f coll]
+   (nmap 2 f coll))
+  ([n f coll]
+   (if (= n 1)
+     (map f coll)
+     (map #(nmap (dec n) f %) coll))))
+
