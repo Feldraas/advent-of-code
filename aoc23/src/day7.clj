@@ -1,92 +1,58 @@
 (ns aoc23.src.day7
-  (:require [utils :refer [read-input parse-int nmap in?]]
-            [ysera.test :refer [is is-not is=]]
-            [clojure.string :as str]
-            [clojure.set :as cset]
-            [clojure.core.match :refer [match]]))
+  (:require [utils :refer [read-input parse-int]]
+            [clojure.string :as str]))
 
-(def test-hands (->> (read-input :test)
-                     (map #(str/split % #" "))
-                     (into {})
-                     (#(update-vals % parse-int))))
+(def test-input (read-input :test))
+(def real-input (read-input))
 
-(def real-hands (->> (read-input)
-                     (map #(str/split % #" "))
-                     (into {})
-                     (#(update-vals % parse-int))))
+(defn get-hands-and-bids
+  [input jokers?]
+  (as-> input res
+        (map #(str/split % #" ") res)
+        (into {} res)
+        (update-vals res parse-int)
+        (if jokers?
+          (update-keys res #(str/replace % "J" "X"))
+          res)))
 
-(defn get-card-strength
-  [card jokers?]
-  (if (and jokers?
-           (= card \J))
-    -1
-    (get (zipmap (map char "23456789TJQKA") (range 13)) card)))
+(defn strength
+  [hand]
+  (let [joker-count (count (re-seq #"X" hand))
+        other-cards (remove (partial = \X) hand)
+        top-2 (->> other-cards
+                   (frequencies)
+                   (vals)
+                   (sort >)
+                   (#(list (first %) (second %)))
+                   (replace {nil 0}))]
+    [(+ joker-count (first top-2)) (second top-2)]))
 
-(defn type-strength
-  [hand jokers?]
-  (let [joker-count (count (re-seq #"J" hand))
-        other-cards (->> hand
-                         (#(str/replace % "J" ""))
-                         (frequencies)
-                         (vals)
-                         (sort))]
-    (if (and jokers? (pos? joker-count))
-      (case [joker-count other-cards]
-        [1 [1 1 1 1]] [:one-pair 2]
-        [1 [1 1 2]] [:three-of-a-kind 4]
-        [1 [1 3]] [:four-of-a-kind 6]
-        [1 [2 2]] [:full-house 5]
-        [1 [4]] [:five-of-a-kind 7]
-        [2 [1 1 1]] [:three-of-a-kind 4]
-        [2 [1 2]] [:four-of-a-kind 6]
-        [2 [3]] [:five-of-a-kind 7]
-        [3 [1 1]] [:four-of-a-kind 6]
-        [3 [2]] [:five-of-a-kind 7]
-        [4 [1]] [:five-of-a-kind 7]
-        [5 []] [:five-of-a-kind 7]
-        (type-strength hand jokers?))
-
-      (case
-        [5] [:five-of-a-kind 7]
-            [1 4] [:four-of-a-kind 6]
-            [2 3] [:full-house 5]
-            [1 1 3] [:three-of-a-kind 4]
-            [1 2 2] [:two-pair 3]
-            [1 1 1 2] [:one-pair 2]
-            [1 1 1 1 1] [:high-card 1]))))
-
-(defn compare-first-card
-  [left right jokers?]
-  (let [left-strength (get-card-strength (first left) jokers?)
-        right-strength (get-card-strength (first right) jokers?)]
-    (cond
-      (< left-strength right-strength) -1
-      (> left-strength right-strength) +1
-      :else (compare-first-card (rest left) (rest right) jokers?))))
+(defn compare-by-first-card
+  [left-hand right-hand]
+  (let [value-map (zipmap (map char "X23456789TJQKA") (range 14))
+        left-card-value (get value-map (first left-hand))
+        right-card-value (get value-map (first right-hand))
+        comp (compare left-card-value right-card-value)]
+    (if (zero? comp)
+      (compare-by-first-card (rest left-hand) (rest right-hand))
+      comp)))
 
 (defn compare-hands
-  [left right jokers?]
-  (let [left-strength (second (type-strength left jokers?))
-        right-strength (second (type-strength right jokers?))]
-    (cond
-      (< left-strength right-strength) -1
-      (> left-strength right-strength) +1
-      :else (compare-first-card left right jokers?))))
+  [left-hand right-hand]
+  (let [left-hand-strength (strength left-hand)
+        right-hand-strength (strength right-hand)]
+    (if (= left-hand-strength right-hand-strength)
+      (compare-by-first-card left-hand right-hand)
+      (compare left-hand-strength right-hand-strength))))
 
 (defn winnings
-  [hands & [jokers?]]
-  (->> hands
-       (sort-by first #(compare-hands %1 %2 jokers?))
+  [input & [jokers?]]
+  (->> (get-hands-and-bids input jokers?)
+       (sort-by first compare-hands)
        (map second)
-       (map vector (range 1 (inc (count hands))))
+       (map vector (range 1 (inc (count input))))
        (map #(apply * %))
        (apply +)))
 
-(winnings real-hands)
-(winnings real-hands :jokers)
-
-
-
-
-
-
+(time (winnings real-input))
+(time (winnings real-input :jokers))
