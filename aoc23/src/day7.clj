@@ -1,5 +1,5 @@
 (ns aoc23.src.day7
-  (:require [utils :refer [read-input parse-int]]
+  (:require [utils :refer [read-input parse-int ->! ->>!]]
             [clojure.string :as str]))
 
 (def test-input (read-input :test))
@@ -22,9 +22,9 @@
         top-2 (->> other-cards
                    (frequencies)
                    (vals)
+                   (->! conj 0 0)
                    (sort >)
-                   (#(list (first %) (second %)))
-                   (replace {nil 0}))]
+                   (take 2))]
     [(+ joker-count (first top-2)) (second top-2)]))
 
 (defn compare-by-first-card

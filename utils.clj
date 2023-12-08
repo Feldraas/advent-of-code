@@ -48,3 +48,11 @@
      (map f coll)
      (map #(nmap (dec n) f %) coll))))
 
+(defn ->!
+  [f & args]
+  (apply f (last args) (butlast args)))
+
+(defn ->>!
+  [f & args]
+  (apply (rest args) (first args)))
+
