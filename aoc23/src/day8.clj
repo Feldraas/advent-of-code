@@ -20,6 +20,13 @@
    :steps    (seq (first input))
    :network  (create-network input)})
 
+(defn get-starts
+  [input]
+  (->> input
+       (create-network)
+       (keys)
+       (filter #(str/ends-with? % "A"))))
+
 (defn next-position
   [state]
   (let [step (first (:steps state))
@@ -52,14 +59,6 @@
       [num-iters (last (termination input final-position final-position))])))
 
 (time (first (termination real-input "AAA" "Z")))           ; Part 1
-
-(defn get-starts
-  [input]
-  (->> input
-       (create-network)
-       (keys)
-       (filter #(str/ends-with? % "A"))))
-
 (time (->> real-input                                       ; Part 2
            (get-starts)
            (map #(termination real-input % "Z"))
