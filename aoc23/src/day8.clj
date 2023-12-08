@@ -1,5 +1,7 @@
 (ns aoc23.src.day8
-  (:require [utils :refer [read-input]]))
+  (:require [utils :refer [read-input rotate]]
+            [clojure.string :as str]
+            [clojure.math.numeric-tower :refer [lcm]]))
 
 (def input (read-input :test))
 (def real-input (read-input))
