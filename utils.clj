@@ -56,3 +56,15 @@
   [f & args]
   (apply (rest args) (first args)))
 
+(defn create-files
+  ([day]
+   (create-files day 23))
+  ([day year]
+   (let [path (str "aoc" year "/")
+         input-path (str path "inputs/")
+         src-path (str path "src/")]
+     (do
+       (spit (str input-path "day" day ".txt") "")
+       (spit (str input-path "day" day ".ex") "")
+       (spit (str src-path "day" day ".clj") (str "(ns aoc23.src.day" day "\n  (:require [utils :refer [read-input]]))"))))))
+
