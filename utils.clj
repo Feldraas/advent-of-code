@@ -11,7 +11,6 @@
   ([day]
    (let [folder (->> (io/file ".")
                      (.list)
-                     (seq)
                      (filter #(str/starts-with? % "aoc"))
                      (sort)
                      (last))]
