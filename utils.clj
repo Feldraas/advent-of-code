@@ -2,13 +2,23 @@
   (:require [clojure.java.io :as io]
             [clojure.string :as str]))
 
+(defn parse-int [s]
+  (if (= s "")
+    0
+    (Integer/parseInt s)))
+
 (defn create-files
   ([day]
-   (create-files day 23))
-  ([day year]
-   (let [path (str "aoc" year "/")
-         input-path (str path "inputs/")
-         src-path (str path "src/")]
+   (let [folder (->> (io/file ".")
+                     (.list)
+                     (seq)
+                     (filter #(str/starts-with? % "aoc"))
+                     (sort)
+                     (last))]
+     (create-files day folder)))
+  ([day folder]
+   (let [input-path (str folder "/inputs/")
+         src-path (str folder "/src/")]
      (do
        (spit (str input-path "day" day ".txt") "")
        (spit (str input-path "day" day ".ex") "")
@@ -28,11 +38,6 @@
         path (str year "/inputs/" file)]
     (->> (with-open [rdr (io/reader path)]
            (mapv str (line-seq rdr))))))
-
-(defn parse-int [s]
-  (if (= s "")
-    0
-    (Integer/parseInt s)))
 
 (defn in?
   "true if coll contains elm"
