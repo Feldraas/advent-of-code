@@ -2,10 +2,20 @@
   (:require [clojure.java.io :as io]
             [clojure.string :as str]))
 
-(defn parse-int [s]
-  (if (= s "")
-    0
-    (Integer/parseInt s)))
+(defn create-files
+  ([day]
+   (create-files day 23))
+  ([day year]
+   (let [path (str "aoc" year "/")
+         input-path (str path "inputs/")
+         src-path (str path "src/")]
+     (do
+       (spit (str input-path "day" day ".txt") "")
+       (spit (str input-path "day" day ".ex") "")
+       (spit (str src-path "day" day ".clj") (str "(ns aoc23.src.day" day "\n"
+                                                  "  (:require [utils :refer [read-input]]))\n\n"
+                                                  "(def input (read-input :test))\n"
+                                                  "(def real-input (read-input))\n\n"))))))
 
 (defn read-input
   [& [arg]]
@@ -18,6 +28,11 @@
         path (str year "/inputs/" file)]
     (->> (with-open [rdr (io/reader path)]
            (mapv str (line-seq rdr))))))
+
+(defn parse-int [s]
+  (if (= s "")
+    0
+    (Integer/parseInt s)))
 
 (defn in?
   "true if coll contains elm"
@@ -48,23 +63,14 @@
      (map f coll)
      (map #(nmap (dec n) f %) coll))))
 
+(defn rotate
+  [[head & tail]]
+  (concat tail (list head)))
+
 (defn ->!
   [f & args]
   (apply f (last args) (butlast args)))
 
 (defn ->>!
-  [f & args]
-  (apply (rest args) (first args)))
-
-(defn create-files
-  ([day]
-   (create-files day 23))
-  ([day year]
-   (let [path (str "aoc" year "/")
-         input-path (str path "inputs/")
-         src-path (str path "src/")]
-     (do
-       (spit (str input-path "day" day ".txt") "")
-       (spit (str input-path "day" day ".ex") "")
-       (spit (str src-path "day" day ".clj") (str "(ns aoc23.src.day" day "\n  (:require [utils :refer [read-input]]))"))))))
-
+  [arg f & args]
+  (apply f (concat args [arg])))
