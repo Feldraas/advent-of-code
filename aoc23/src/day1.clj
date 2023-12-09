@@ -1,9 +1,9 @@
 (ns aoc23.src.day1
-  (:require [utils :refer [read-input
-                           parse-int]]
-            [clojure.string :as str]))
+  (:require
+    [utils :refer [read-input parse-int]]
+    [clojure.string :as str]))
 
-(def calibration (read-input "day1.txt"))
+(def calibration (read-input))
 
 (def digit-map (-> (zipmap ["zero" "one" "two" "three" "four" "five" "six" "seven" "eight" "nine"]
                            (map str (range 10)))
@@ -15,10 +15,10 @@
           string
           (sort-by #(- (count %)) (keys digit-map))))
 
-(->> calibration
-     (map text->digit)                                      ; Comment out for part 1
-     (map #(str/replace % #"[a-z]+" ""))
-     (map (juxt first last))
-     (map #(apply str %))
-     (map parse-int)
-     (apply +))
+(time (->> calibration
+           (map text->digit)                                ; Comment out for part 1
+           (map #(str/replace % #"[a-z]+" ""))
+           (map (juxt first last))
+           (map #(apply str %))
+           (map parse-int)
+           (apply +)))

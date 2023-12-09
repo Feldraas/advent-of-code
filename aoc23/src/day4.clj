@@ -1,7 +1,8 @@
 (ns aoc23.src.day4
-  (:require [utils :refer [read-input parse-int]]
-            [clojure.string :as str]
-            [clojure.set :as cset]))
+  (:require
+    [utils :refer [read-input parse-int]]
+    [clojure.string :as str]
+    [clojure.set :refer [intersection]]))
 
 (def cards (read-input))
 
@@ -11,12 +12,12 @@
         (str/split $ #" \| ")
         (map #(str/split % #" +") $)
         (let [[winners numbers] (map #(set (map parse-int %)) $)
-              matches (count (cset/intersection winners numbers))]
+              matches (count (intersection winners numbers))]
           (if (zero? matches)
             0
             (reduce * (repeat (dec matches) 2))))))
 
-(apply + (map score cards))
+(time (apply + (map score cards)))
 
 ; Part 2
 
@@ -26,7 +27,7 @@
         (str/split $ #" \| ")
         (map #(str/split % #" +") $)
         (let [[winners numbers] (map #(set (map parse-int %)) $)]
-          (count (cset/intersection winners numbers)))))
+          (count (intersection winners numbers)))))
 
 (def copies (zipmap (range 1 (inc (count cards))) (repeat 1)))
 
@@ -35,9 +36,12 @@
   (let [card (nth cards (dec n))
         num-matches (matches card)
         cards-to-add (range (inc n) (+ n num-matches 1))]
-    (reduce #(update %1 %2 + (get %1 n)) copies cards-to-add)))
+    (reduce (fn [acc-copies card]
+              (update acc-copies card + (get acc-copies n)))
+            copies
+            cards-to-add)))
 
-(as-> copies $
-      (reduce process-card $ (sort (keys $)))
-      (vals $)
-      (apply + $))
+(time (as-> copies $
+            (reduce process-card $ (sort (keys $)))
+            (vals $)
+            (apply + $)))

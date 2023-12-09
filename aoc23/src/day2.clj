@@ -1,7 +1,7 @@
 (ns aoc23.src.day2
-  (:require [utils :refer [read-input
-                           parse-int]]
-            [clojure.string :as str]))
+  (:require
+    [utils :refer [read-input parse-int]]
+    [clojure.string :as str]))
 
 (defn parse-color
   [color string]
@@ -37,14 +37,14 @@
        (every? true?)))
 
 
-(def games (-> (read-input "day2.txt")))
+(def games (read-input))
 (def cube-limits [12 13 14])
 
-(as-> games $
-      (map parse-game $)
-      (map #(game-possible? % cube-limits) $)
-      (filter #(nth $ (dec %)) (range 1 (inc (count games))))
-      (apply + $))
+(time (as-> games $
+            (map parse-game $)
+            (map #(game-possible? % cube-limits) $)
+            (filter #(nth $ (dec %)) (range 1 (inc (count games))))
+            (apply + $)))
 
 (defn minimum-amounts
   [game]
@@ -52,8 +52,8 @@
                  (max (second %1) (second %2))
                  (max (last %1) (last %2))) game))
 
-(->> games
-     (map parse-game)
-     (map minimum-amounts)
-     (map #(apply * %))
-     (apply +))
+(time (->> games
+           (map parse-game)
+           (map minimum-amounts)
+           (map #(apply * %))
+           (apply +)))

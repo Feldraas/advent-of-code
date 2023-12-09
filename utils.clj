@@ -22,7 +22,8 @@
        (spit (str input-path "day" day ".txt") "")
        (spit (str input-path "day" day ".ex") "")
        (spit (str src-path "day" day ".clj") (str "(ns aoc23.src.day" day "\r\n"
-                                                  "  (:require [utils :refer [read-input]]))\r\n\r\n"
+                                                  "  (:require \r\n"
+                                                  "    [utils :refer [read-input]]))\r\n\r\n"
                                                   "(def input (read-input :test))\r\n"
                                                   "(def real-input (read-input))\r\n\r\n"))))))
 

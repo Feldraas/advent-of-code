@@ -1,11 +1,12 @@
 (ns aoc23.src.day5
-  (:require [utils :refer [read-input nmap in?]]))
+  (:require
+    [utils :refer [read-input nmap ->!]]))
 
 
 (defn get-almanac
   [& [arg]]
   (->> (read-input arg)
-       (partition-by #(= % ""))
+       (partition-by #{""})
        (take-nth 2)))
 
 (def test-almanac (get-almanac :test))
@@ -22,8 +23,8 @@
   [almanac]
   (->> (get-seeds almanac)
        (partition 2)
-       (map #(vector (first %) (+ (first %) (second %) -1)))))
-
+       (map (fn [[start length]]
+              (vector start (+ start length -1))))))
 
 (defn get-almanac-map
   [almanac n]
@@ -40,97 +41,85 @@
       (let [range (first almanac-map)
             range-start (second range)
             range-end (+ (second range) (last range) -1)
-            diff (- (first range) (second range))]
+            shift (- (first range) (second range))]
         (if (<= range-start num range-end)
-          (+ num diff)
+          (+ num shift)
           (find-next (rest almanac-map) num step))))))
 
 (defn find-seed-location
   ([almanac seed]
    (find-seed-location almanac seed (dec (count almanac))))
   ([almanac seed n]
-   (reduce #(find-next (get-almanac-map almanac %2) %1 %2) seed (range 1 (inc n)))))
+   (reduce (fn [acc-location current-map-number]
+             (->> current-map-number
+                  (get-almanac-map almanac)
+                  (->! find-next acc-location current-map-number)))
+           seed
+           (range 1 (inc n)))))
 
-(defn trace
-  [almanac seed]
-  (map #(find-seed-location almanac seed %) (range (count almanac))))
-
-(time (let [seeds (get-seeds real-almanac)]
-        (->> (map #(find-seed-location real-almanac %) seeds)
+(time (let [all-seeds (get-seeds real-almanac)]
+        (->> all-seeds
+             (map (fn [seed]
+                    (find-seed-location real-almanac seed)))
              (apply min))))
 
 ; Part 2
 
-(defn join-into-limit-map
-  [left right]
-  (let [[[left-low left-high] left-diff] left]
-    (->> (for [[[right-low right-high] right-diff] right]
-           [[(max left-low (- right-low left-diff)) (min left-high (- right-high left-diff))] (+ left-diff right-diff)])
-         (remove #(> (first (first %)) (second (first %)))))))
-
-(defn join-limits
-  [left right]
-  (->> left
-       (map #(join-into-limit-map % right))
-       (apply concat)))
-
-(defn get-max-value
-  [almanac]
-  (let [max-seed (->> (get-seed-ranges almanac)
-                      (map second)
-                      (apply max))
-        max-inc (->> (map #(get-almanac-map almanac %) (range 1 8))
-                     (nmap 2 #(- (first %) (second %)))
-                     (map #(apply max %))
-                     (apply +))]
-    (+ max-seed max-inc)))
-
 (defn fill-map
-  [lmap max-value]
-  (let [ordered (sort-by first lmap)
-        starts (map #(first (first %)) ordered)
-        ends (map #(second (first %)) ordered)
-        missing-starts (->> ends
-                            (map inc)
-                            (remove #(in? starts %))
-                            (remove #(= (inc (apply max ends)) %))
-                            (sort))
-        missing-ends (->> starts
-                          (map dec)
-                          (remove #(in? ends %))
-                          (remove #(= -1 %))
-                          (sort))
-
-        reduced (reduce #(assoc %1 [(nth missing-starts %2) (nth missing-ends %2)] 0)
-                        lmap
-                        (range (count missing-ends)))
-        reduced-starts (map first (keys reduced))
-        reduced-ends (map second (keys reduced))]
-    (cond-> reduced
-            (not (in? reduced-starts 0)) (assoc [0 (dec (apply min reduced-starts))] 0)
-            (not (in? reduced-ends max-value)) (assoc [(inc (apply max reduced-ends)) max-value] 0))))
+  [limit-map]
+  (let [starts (map (fn [[[start end] shift]] start) limit-map)
+        ends (map (fn [[[start end] shift]] end) limit-map)
+        required-starts (-> (map inc ends)
+                            (conj 0))
+        required-ends (-> (map dec starts)
+                          (conj ##Inf))
+        missing-starts (remove (set starts) required-starts)
+        missing-ends (remove (set ends) required-ends)]
+    (reduce (fn [acc-map [missing-start missing-end]]
+              (assoc acc-map [missing-start missing-end] 0))
+            limit-map
+            (map vector missing-starts missing-ends))))
 
 (defn get-limit-map
   [almanac n]
-  (as-> (get-almanac-map almanac n) $
-        (map #(vector [(second %) (+ (second %) (last %) -1)] (- (first %) (second %))) $)
-        (into {} $)
-        (fill-map $ (get-max-value almanac))))
+  (->> (get-almanac-map almanac n)
+       (map (fn [[dest-start source-start length]]
+              (vector [source-start (+ source-start length -1)] (- dest-start source-start))))
+       (into {})
+       (fill-map)))
+
+(defn absorb-new-limit
+  [limit-map new-limit]
+  (let [[[llow lhigh] lshift] new-limit]
+    (->> limit-map
+         (map (fn [[[rlow rhigh] rshift]]
+                [[(max llow (- rlow lshift)) (min lhigh (- rhigh lshift))] (+ lshift rshift)]))
+         (remove (fn [[[low high] diff]]
+                   (> low high))))))
+
+(defn splice-into-next-map
+  [current-map next-map]
+  (->> current-map
+       (map (partial absorb-new-limit next-map))
+       (apply concat)))
 
 (defn get-final-map
   [almanac]
-  (->> (map #(get-limit-map almanac %) (range 1 8))
-       (reduce join-limits)
+  (->> (map (partial get-limit-map almanac)
+            (range 1 (count almanac)))
+       (reduce splice-into-next-map)
        (sort-by first)))
 
 (defn get-min-location-for-range
   [almanac seed-range]
   (let [locs (->> (get-final-map almanac)
-                  (filter #(and
-                             (>= (second (first %)) (first seed-range))
-                             (<= (first (first %)) (second seed-range))))
+                  (filter (fn [[[start end] shift]]
+                            (and
+                              (>= end (first seed-range))
+                              (<= start (second seed-range)))))
                   (sort-by first)
-                  (map #(+ (first (first %)) (last %))))]
+                  (map (fn [[[start end] shift]]
+                         (+ start shift))))]
     (apply min locs)))
 
 (time (as-> (get-seed-ranges real-almanac) $

@@ -1,5 +1,6 @@
 (ns aoc23.src.day3
-  (:require [utils :refer [read-input parse-int]]))
+  (:require
+    [utils :refer [read-input parse-int]]))
 
 (def schematic (read-input))
 (def borders [(count schematic) (count (first schematic))])
@@ -28,16 +29,16 @@
 
 (def merged-grid
   (let [coords (->> raw-grid
-                    (filter #(intstring? (second %)))
+                    (filter (fn [[point char]] (intstring? char)))
                     (keys)
                     (sort-by (juxt first #(- (second %)))))]
     (reduce merge-left raw-grid coords)))
 
 (defn get-neighbors
   [grid [x y] length]
-  (map #(get grid %) (for [dx [-1 0 1]
-                           dy (range -1 (inc length))]
-                       [(+ x dx) (+ y dy)])))
+  (for [dx [-1 0 1]
+        dy (range -1 (inc length))]
+    (get grid [(+ x dx) (+ y dy)])))
 
 (defn part?
   [grid [x y]]
@@ -48,12 +49,12 @@
       (intstring? num)
       (some #(not (intstring? %)) neighbors))))
 
-(->> merged-grid
-     (filter #(part? merged-grid (first %)))
-     (sort-by first)
-     (map second)
-     (map parse-int)
-     (apply +))
+(time (->> merged-grid
+           (filter #(part? merged-grid (first %)))
+           (sort-by first)
+           (map second)
+           (map parse-int)
+           (apply +)))
 
 ; Part 2
 
@@ -94,7 +95,7 @@
        (map parse-int)
        (apply *)))
 
-(->> (keys raw-grid)
-     (filter #(gear? raw-grid %))
-     (map #(gear-ratio raw-grid %))
-     (apply +))
+(time (->> (keys raw-grid)
+           (filter #(gear? raw-grid %))
+           (map #(gear-ratio raw-grid %))
+           (apply +)))

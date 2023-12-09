@@ -1,8 +1,6 @@
 (ns aoc23.src.day6
-  (:require [utils :refer [read-input parse-int nmap]]
-            [ysera.test :refer [is is-not is=]]
-            [clojure.string :as str]
-            [clojure.set :as cset]))
+  (:require
+    [utils :refer [read-input parse-int nmap]]))
 
 
 (def test-races (->> (read-input :test)
@@ -32,14 +30,14 @@
   (->> (map ways-to-beat races)
        (apply *)))
 
-(margin real-races)
+(time (margin real-races))
 
 ; Part 2
 
-(->> real-races
-     (#(vector (keys %) (vals %)))
-     (map #(apply str %))
-     (map bigint)
-     (vector)
-     (margin))
+(time (as-> real-races res
+            (vector (keys res) (vals res))
+            (map #(apply str %) res)
+            (map bigint res)
+            (vector res)
+            (margin res)))
 
