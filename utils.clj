@@ -1,6 +1,7 @@
 (ns utils
   (:require [clojure.java.io :as io]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [ysera.test :refer [is=]]))
 
 (defn parse-int [s]
   (if (= s "")
@@ -79,3 +80,9 @@
 (defn ->>!
   [arg f & args]
   (apply f (concat args [arg])))
+
+(defn unnil
+  [x val]
+  (if (nil? x)
+    val
+    x))
