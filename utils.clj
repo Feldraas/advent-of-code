@@ -1,6 +1,7 @@
 (ns utils
   (:require [clojure.java.io :as io]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [ysera.test :refer [is=]]))
 
 (defn parse-int [s]
   (if (= s "")
@@ -45,7 +46,7 @@
   (some #(= elm %) coll))
 
 (defn get-adjacent
-  [[x y] n]
+  [n [x y]]
   (case n
     4 (list [(inc x) y] [(dec x) y] [x (inc y)] [x (dec y)])
     5 (conj (get-adjacent [x y] 4) [x y])
@@ -91,3 +92,34 @@
   (->> string
        (re-seq #"-?\d+")
        (map parse-int)))
+
+(defn filter-keys
+  [f m]
+  (->> m
+       (filter (fn [[key value]] (f key)))
+       (into {})))
+
+(defn filter-vals
+  [f m]
+  (->> m
+       (filter (fn [[key value]] (f value)))
+       (into {})))
+
+(defn mfilter
+  {:test (fn []
+           (is= (mfilter :keys even? {1 :a 2 :b 3 :c 4 :d})
+                {2 :b 4 :d})
+           (is= (mfilter :vals even? {:a 2 :b 3 :c 4 :d 1})
+                {:a 2 :c 4}))}
+  ([f m]
+   (mfilter :keys f m))
+  ([by f m]
+   (case by
+     :keys (filter-keys f m)
+     :vals (filter-vals f m))))
+
+(defn mremove
+  ([f m]
+   (mremove :keys f m))
+  ([by f m]
+   (mfilter by (complement f) m)))
