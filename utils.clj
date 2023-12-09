@@ -10,19 +10,21 @@
 
 (defn create-files
   ([day]
-   (let [folder (->> (io/file ".")
-                     (.list)
-                     (filter #(str/starts-with? % "aoc"))
-                     (sort)
-                     (last))]
-     (create-files day folder)))
-  ([day folder]
-   (let [input-path (str folder "/inputs/")
-         src-path (str folder "/src/")]
+   (let [year (->> (io/file ".")
+                   (.list)
+                   (filter #(str/starts-with? % "aoc"))
+                   (sort)
+                   (last)
+                   (re-seq #"\d+")
+                   (first))]
+     (create-files day year)))
+  ([day year]
+   (let [input-path (str "aoc" year "/inputs/")
+         src-path (str "aoc" year "/src/")]
      (do
        (spit (str input-path "day" day ".txt") "")
        (spit (str input-path "day" day ".ex") "")
-       (spit (str src-path "day" day ".clj") (str "(ns aoc23.src.day" day "\r\n"
+       (spit (str src-path "day" day ".clj") (str "(ns aoc" year ".src.day" day "\r\n"
                                                   "  (:require \r\n"
                                                   "    [utils :refer [read-input]]))\r\n\r\n"
                                                   "(def input (read-input :test))\r\n"
