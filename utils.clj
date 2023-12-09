@@ -1,7 +1,6 @@
 (ns utils
   (:require [clojure.java.io :as io]
-            [clojure.string :as str]
-            [ysera.test :refer [is=]]))
+            [clojure.string :as str]))
 
 (defn parse-int [s]
   (if (= s "")
@@ -86,3 +85,9 @@
   (if (nil? x)
     val
     x))
+
+(defn extract-numbers
+  [string]
+  (->> string
+       (re-seq #"-?\d+")
+       (map parse-int)))
