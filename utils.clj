@@ -1,46 +1,17 @@
 (ns utils
-  (:require [clojure.java.io :as io]
-            [clojure.string :as str]
-            [ysera.test :refer [is=]]))
+  (:require
+    [ysera.test :refer [is=]]))
 
 (defn parse-int [s]
   (if (= s "")
     0
     (Integer/parseInt s)))
 
-(defn create-files
-  ([day]
-   (let [year (->> (io/file ".")
-                   (.list)
-                   (filter #(str/starts-with? % "aoc"))
-                   (sort)
-                   (last)
-                   (re-seq #"\d+")
-                   (first))]
-     (create-files day year)))
-  ([day year]
-   (let [input-path (str "aoc" year "/inputs/")
-         src-path (str "aoc" year "/src/")]
-     (do
-       (spit (str input-path "day" day ".txt") "")
-       (spit (str input-path "day" day ".ex") "")
-       (spit (str src-path "day" day ".clj") (str "(ns aoc" year ".src.day" day "\r\n"
-                                                  "  (:require \r\n"
-                                                  "    [utils :refer [read-input]]))\r\n\r\n"
-                                                  "(def input (read-input :test))\r\n"
-                                                  "(def real-input (read-input))\r\n\r\n"))))))
-
-(defn read-input
-  [& [arg]]
-  (let [[year _ day] (-> (str *ns*)
-                         (str/split #"\."))
-        file (cond
-               (nil? arg) (str day ".txt")
-               (= arg :test) (str day ".ex")
-               :else (str (name arg) ".txt"))
-        path (str year "/inputs/" file)]
-    (->> (with-open [rdr (io/reader path)]
-           (mapv str (line-seq rdr))))))
+(defn extract-numbers
+  [string]
+  (->> string
+       (re-seq #"-?\d+")
+       (map parse-int)))
 
 (defn in?
   "true if coll contains elm"
@@ -88,12 +59,6 @@
   (if (nil? x)
     val
     x))
-
-(defn extract-numbers
-  [string]
-  (->> string
-       (re-seq #"-?\d+")
-       (map parse-int)))
 
 (defn filter-keys
   [f m]

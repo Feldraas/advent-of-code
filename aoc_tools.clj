@@ -24,7 +24,8 @@
         example-text (extract-example-text (:body base-response))
         input-response (client/get input-url payload)
         input-text (:body input-response)]
-    [example-text input-text]))
+    [(str/replace example-text "\n" "\r\n")
+     (str/replace input-text "\n" "\r\n")]))
 
 (defn create-files
   ([day]
