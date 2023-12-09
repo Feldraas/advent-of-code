@@ -1,11 +1,12 @@
 (ns aoc22.src.day4
-  (:require [utils :refer [read-input
-                           parse-int]]
-            [clojure.set :refer [intersection
-                                 subset?]]
-            [clojure.string :as str]))
+  (:require
+    [aoc-tools :refer [read-input]]
+    [utils :refer [parse-int]]
+    [clojure.set :refer [intersection
+                         subset?]]
+    [clojure.string :as str]))
 
-(def pairs (read-input "day4.txt"))
+(def pairs (read-input))
 
 (defn str->set
   [string]

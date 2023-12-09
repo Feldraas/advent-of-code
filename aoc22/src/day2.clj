@@ -1,13 +1,14 @@
 (ns aoc22.src.day2
-  (:require [utils :refer [read-input]]
-            [clojure.set :refer [map-invert]]))
+  (:require
+    [aoc-tools :refer [read-input]]
+    [clojure.set :refer [map-invert]]))
 
 (defn parse-strat
   [[opp-shape _ my-shape]]
   [(get {\A :rock \B :paper \C :scissors} opp-shape)
    (get {\X :rock \Y :paper \Z :scissors} my-shape)])
 
-(def strats (read-input "day2.txt"))
+(def strats (read-input))
 
 (def to-beat {:rock :paper :paper :scissors :scissors :rock})
 (defn beats?

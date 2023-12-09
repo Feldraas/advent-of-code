@@ -1,7 +1,8 @@
 (ns aoc22.src.day14
-  (:require [utils :refer [read-input
-                           parse-int]]
-            [clojure.string :as str]))
+  (:require
+    [aoc-tools :refer [read-input]]
+    [utils :refer [parse-int]]
+    [clojure.string :as str]))
 
 (def wall-char "▓")
 (def sand-char ".")
@@ -28,7 +29,7 @@
           cave
           (drop-last 1 (range (count points)))))
 
-(def walls (->> (read-input "day14.txt")
+(def walls (->> (read-input)
                 (map #(str/replace % #"(,| -> )" " "))
                 (map #(str/split % #" "))
                 (map #(map parse-int %))

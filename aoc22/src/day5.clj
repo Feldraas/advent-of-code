@@ -1,8 +1,9 @@
 (ns aoc22.src.day5
-  (:require [utils :refer [read-input
-                           parse-int]]))
+  (:require
+    [aoc-tools :refer [read-input]]
+    [utils :refer [parse-int]]))
 
-(def commands (read-input "day5.txt"))
+(def commands (read-input))
 
 (def crates {1 (map char "MSJLVFNR")
              2 (map char "HWJFZDNP")

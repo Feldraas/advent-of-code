@@ -1,9 +1,9 @@
 (ns aoc22.src.day15
-  (:require [utils :refer [read-input
-                           parse-int]]
-            [clojure.string :as str]))
+  (:require
+    [aoc-tools :refer [read-input]]
+    [utils :refer [parse-int]]))
 
-(def report (read-input "day15.txt"))
+(def report (read-input))
 
 (defn distance
   [[x1 y1] [x2 y2]]

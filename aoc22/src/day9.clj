@@ -1,8 +1,9 @@
 (ns aoc22.src.day9
-  (:require [utils :refer [read-input
-                           parse-int]]))
+  (:require
+    [aoc-tools :refer [read-input]]
+    [utils :refer [parse-int]]))
 
-(def commands (read-input "day9.txt"))
+(def commands (read-input))
 
 (defn create-state
   [num-knots]

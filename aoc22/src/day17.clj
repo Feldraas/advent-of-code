@@ -1,5 +1,6 @@
 (ns aoc22.src.day17
-  (:require [utils :refer [read-input]]))
+  (:require
+    [aoc-tools :refer [read-input]]))
 
 (defn rotate
   [object]

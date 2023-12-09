@@ -1,7 +1,8 @@
 (ns aoc22.src.day8
-  (:require [utils :refer [read-input]]))
+  (:require
+    [aoc-tools :refer [read-input]]))
 
-(def grid (read-input "day8.txt"))
+(def grid (read-input))
 
 (def side (count (first grid)))
 

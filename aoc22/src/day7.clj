@@ -1,9 +1,10 @@
 (ns aoc22.src.day7
-  (:require [utils :refer [read-input
-                           parse-int]]
-            [clojure.string :as str]))
+  (:require
+    [aoc-tools :refer [read-input]]
+    [utils :refer [parse-int]]
+    [clojure.string :as str]))
 
-(def log (read-input "day7.txt"))
+(def log (read-input))
 
 (def state
   {"/"           {}

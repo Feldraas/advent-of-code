@@ -1,9 +1,10 @@
 (ns aoc22.src.day10
-  (:require [utils :refer [read-input
-                           parse-int]]
-            [clojure.string :as str]))
+  (:require
+    [aoc-tools :refer [read-input]]
+    [utils :refer [parse-int]]
+    [clojure.string :as str]))
 
-(def commands (read-input "day10.txt"))
+(def commands (read-input))
 
 (def state [{:completed-cycles 0
              :register         1}])

@@ -1,7 +1,8 @@
 (ns aoc22.src.day6
-  (:require [utils :refer [read-input]]))
+  (:require
+    [aoc-tools :refer [read-input]]))
 
-(def message (first (read-input "day6.txt")))
+(def message (first (read-input)))
 
 (defn find-distinct
   ([n string]

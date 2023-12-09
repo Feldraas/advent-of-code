@@ -1,6 +1,7 @@
 (ns aoc22.src.day20
   (:require
-    [utils :refer [read-input parse-int mfilter]]
+    [aoc-tools :refer [read-input]]
+    [utils :refer [parse-int mfilter]]
     [ysera.test :refer [is=]]))
 
 
@@ -84,4 +85,3 @@
 
 (time (coordinate-sum real-input 1 1))                      ; Part 1 ~10 seconds
 (time (coordinate-sum real-input 811589153 10))             ; Part 2 ~90 seconds
-

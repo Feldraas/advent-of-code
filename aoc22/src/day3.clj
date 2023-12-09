@@ -1,8 +1,9 @@
 (ns aoc22.src.day3
-  (:require [utils :refer [read-input]]
-            [clojure.set :refer [intersection]]))
+  (:require
+    [aoc-tools :refer [read-input]]
+    [clojure.set :refer [intersection]]))
 
-(def contents (read-input "day3.txt"))
+(def contents (read-input))
 
 (defn split-compartments
   [string]

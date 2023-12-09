@@ -1,7 +1,8 @@
 (ns aoc22.src.day11
-  (:require [utils :refer [read-input
-                           parse-int]]
-            [clojure.string :as str]))
+  (:require
+    [aoc-tools :refer [read-input]]
+    [utils :refer [parse-int]]
+    [clojure.string :as str]))
 
 (def raw (read-input "day11.txt"))
 (def num-monkeys (->> (drop-last 5 raw)

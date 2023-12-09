@@ -1,6 +1,7 @@
 (ns aoc22.src.day13
-  (:require [utils :refer [read-input]]
-            [clojure.string :as str]))
+  (:require
+    [aoc-tools :refer [read-input]]
+    [clojure.string :as str]))
 
 (defn wrap-first
   [coll]
@@ -34,7 +35,7 @@
 
     :else (ordered? (first left) (first right))))
 
-(def packets (->> (read-input "day13.txt")
+(def packets (->> (read-input)
                   (remove empty?)
                   (map #(str/replace % "[" "("))
                   (map #(str/replace % "]" ")"))
