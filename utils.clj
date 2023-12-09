@@ -13,6 +13,10 @@
        (re-seq #"-?\d+")
        (map parse-int)))
 
+(defn intstring?
+  [s]
+  (re-seq #"^-?\d+$" (str s)))
+
 (defn in?
   "true if coll contains elm"
   [coll elm]

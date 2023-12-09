@@ -1,6 +1,7 @@
 (ns aoc23.src.day7
   (:require
-    [utils :refer [read-input parse-int ->!]]
+    [aoc-tools :refer [read-input]]
+    [utils :refer [parse-int ->!]]
     [clojure.string :as str]))
 
 (def test-input (read-input :test))

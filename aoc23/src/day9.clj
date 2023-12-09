@@ -1,6 +1,7 @@
 (ns aoc23.src.day9
   (:require
-    [utils :refer [read-input extract-numbers]]))
+    [aoc-tools :refer [read-input]]
+    [utils :refer [extract-numbers]]))
 
 (def input (read-input :test))
 (def real-input (read-input))

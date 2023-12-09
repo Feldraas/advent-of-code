@@ -1,6 +1,7 @@
 (ns aoc23.src.day3
   (:require
-    [utils :refer [read-input parse-int]]))
+    [aoc-tools :refer [read-input]]
+    [utils :refer [parse-int intstring?]]))
 
 (def schematic (read-input))
 (def borders [(count schematic) (count (first schematic))])
@@ -12,10 +13,6 @@
               :when (not= c ".")]
           [[x y] c]) res
         (into {} res)))
-
-(defn intstring?
-  [s]
-  (re-seq #"^\d+$" (str s)))
 
 (defn merge-left
   [grid [x y]]

@@ -1,6 +1,7 @@
 (ns aoc23.src.day6
   (:require
-    [utils :refer [read-input parse-int nmap]]))
+    [aoc-tools :refer [read-input]]
+    [utils :refer [parse-int nmap]]))
 
 
 (def test-races (->> (read-input :test)

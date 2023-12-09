@@ -1,6 +1,7 @@
 (ns aoc23.src.day2
   (:require
-    [utils :refer [read-input parse-int]]
+    [aoc-tools :refer [read-input]]
+    [utils :refer [parse-int]]
     [clojure.string :as str]))
 
 (defn parse-color

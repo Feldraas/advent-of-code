@@ -1,6 +1,7 @@
 (ns aoc23.src.day5
   (:require
-    [utils :refer [read-input nmap ->!]]))
+    [aoc-tools :refer [read-input]]
+    [utils :refer [nmap ->!]]))
 
 
 (defn get-almanac

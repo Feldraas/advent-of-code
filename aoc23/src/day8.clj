@@ -1,6 +1,7 @@
 (ns aoc23.src.day8
   (:require
-    [utils :refer [read-input rotate]]
+    [aoc-tools :refer [read-input]]
+    [utils :refer [rotate]]
     [clojure.string :as str]
     [clojure.math.numeric-tower :refer [lcm]]))
 
