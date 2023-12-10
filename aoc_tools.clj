@@ -1,6 +1,6 @@
 (ns aoc-tools
   (:require
-    [utils :refer [extract-numbers ->! unnil]]
+    [utils :refer [extract-numbers ->! unnil parse-int]]
     [clj-http.client :as client]
     [clojure.string :as str]
     [clojure.java.io :as io]
@@ -31,12 +31,12 @@
   ([day]
    (let [year (->> (io/file ".")
                    (.list)
-                   (filter #(str/starts-with? % "aoc"))
+                   (filter #(re-seq #"aoc\d\d" %))
                    (sort)
                    (last)
                    (re-seq #"\d+")
                    (first))]
-     (create-files year day)))
+     (create-files (parse-int year) day)))
 
   ([year day]
    (let [year (mod year 2000)
