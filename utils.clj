@@ -94,3 +94,11 @@
    (mremove :keys f m))
   ([by f m]
    (mfilter by (complement f) m)))
+
+(defn iterate-until
+  [condition f start-val]
+  (->> start-val
+       (iterate f)
+       (take-while (complement condition))
+       (last)
+       (f)))

@@ -1,6 +1,6 @@
 (ns aoc-tools
   (:require
-    [utils :refer [extract-numbers]]
+    [utils :refer [extract-numbers ->! unnil]]
     [clj-http.client :as client]
     [clojure.string :as str]
     [clojure.java.io :as io]
@@ -70,6 +70,16 @@
     (->> (with-open [rdr (io/reader path)]
            (mapv str (line-seq rdr))))))
 
+(defn extract-main
+  [text]
+  (->> text
+       (re-seq #"(?is)<main>\n (<[^ ]+?>)+(.*?)(<[^ ]+?>)+\n </main>")
+       (first)
+       (drop-last)
+       (last)
+       (->! unnil text)
+       (->! str/replace #"<.*?>" "")))
+
 (defn submit-answer
   [part answer]
   (let [[year day] (get-year-and-day)
@@ -78,5 +88,6 @@
         payload {:method      "POST"
                  :headers     {:Cookie     cookie
                                :User-Agent "Feldraas' AoC Clojure Library https://github.com/Feldraas/advent-of-code"}
-                 :form-params {"level" (str part) "answer" (str answer)}}]
-    (client/post url payload)))
+                 :form-params {"level" (str part) "answer" (str answer)}}
+        response (client/post url payload)]
+    (extract-main (:body response))))
