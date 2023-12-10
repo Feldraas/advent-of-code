@@ -65,7 +65,7 @@
         file (cond
                (nil? arg) (str "day" day ".txt")
                (= arg :test) (str "day" day ".ex")
-               :else (str (name arg) ".txt"))
+               :else (str (name arg)))
         path (str "aoc" year "/inputs/" file)]
     (->> (with-open [rdr (io/reader path)]
            (mapv str (line-seq rdr))))))
@@ -76,9 +76,7 @@
        (re-seq #"(?is)<main>\n (<[^ ]+?>)+(.*?)(<[^ ]+?>)+\n </main>")
        (first)
        (drop-last)
-       (last)
-       (->! unnil text)
-       (->! str/replace #"<.*?>" "")))
+       (last)))
 
 (defn submit-answer
   [part answer]
@@ -89,5 +87,8 @@
                  :headers     {:Cookie     cookie
                                :User-Agent "Feldraas' AoC Clojure Library https://github.com/Feldraas/advent-of-code"}
                  :form-params {"level" (str part) "answer" (str answer)}}
-        response (client/post url payload)]
-    (extract-main (:body response))))
+        response (client/post url payload)
+        main (extract-main (:body response))]
+    (if main
+      main
+      (re-seq #"(?is)(That's not the right answer.*?\[Return to Day \d+\])" (:body response)))))
