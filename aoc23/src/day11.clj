@@ -7,9 +7,8 @@
 
 (defn get-empty-rows
   [input]
-  (->> input
-       (map-indexed (fn [row-idx row] (if (every? #{\.} row) row-idx nil)))
-       (remove nil?)))
+  (->> (range (count input))
+       (filter (fn [idx] (every? #{\.} (nth input idx))))))
 
 (defn get-col
   [input col]
@@ -18,10 +17,9 @@
 (defn get-empty-cols
   [input]
   (->> (range (count (first input)))
-       (map (fn [col-idx] (if (every? #{\.} (get-col input col-idx)) col-idx nil)))
-       (remove nil?)))
+       (filter (fn [idx] (every? #{\.} (get-col input idx))))))
 
-(defn move-galaxy
+(defn shift-galaxy
   [input times [x y]]
   (let [rows (get-empty-rows input)
         dx (->> rows
@@ -35,31 +33,31 @@
                 (* (dec times)))]
     [(+ x dx) (+ y dy)]))
 
-(defn get-galaxies
+(defn get-shifted-galaxies
   [input times]
-  (->> (for [x (range (count input))
-             y (range (count (first input)))
-             :when (= (nth (nth input x) y) \#)]
-         [x y])
-       (map (partial move-galaxy input times))))
+  (let [galaxy-coords (for [x (range (count input))
+                            y (range (count (first input)))
+                            :when (= (nth (nth input x) y) \#)]
+                        [x y])]
+    (map (partial shift-galaxy input times) galaxy-coords)))
 
 (defn distance
   [[x1 y1] [x2 y2]]
   (+ (abs (- x1 x2)) (abs (- y1 y2))))
 
-(defn distance-sum
+(defn total-distance-sum
   [input times]
-  (->> (for [g1 (get-galaxies input times)
-             g2 (get-galaxies input times)
-             :when (= (compare g1 g2) -1)]
-         (distance g1 g2))
-       (apply +)))
+  (let [galaxy-list (get-shifted-galaxies input times)]
+    (->> (for [g1 galaxy-list
+               g2 galaxy-list
+               :when (pos? (compare g1 g2))]
+           (distance g1 g2))
+         (apply +))))
 
-
-(->> (distance-sum real-input 2)
+(->> (total-distance-sum real-input 2)
      (time)
      #_(submit-answer 1))
 
-(->> (distance-sum real-input 1000000)
+(->> (total-distance-sum real-input 1000000)
      (time)
      #_(submit-answer 2))
