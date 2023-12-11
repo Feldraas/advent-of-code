@@ -69,7 +69,7 @@
   (let [state (if (map? state) state (create-state state))
         state (if compress?
                 (-> (mfilter (partial every? even?) state)
-                    (update-keys #(vec (map int (map (partial * 0.5) %)))))
+                    (update-keys #(vec (map (comp int (partial * 0.5)) %))))
                 state)
         [xmax ymax] (get-borders state)]
     (->> (for [x (range (inc xmax))
