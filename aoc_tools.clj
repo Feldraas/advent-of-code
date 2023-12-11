@@ -87,8 +87,6 @@
                  :headers     {:Cookie     cookie
                                :User-Agent "Feldraas' AoC Clojure Library https://github.com/Feldraas/advent-of-code"}
                  :form-params {"level" (str part) "answer" (str answer)}}
-        response (client/post url payload)
-        main (extract-main (:body response))]
-    (if main
-      main
-      (re-seq #"(?is)(That's not the right answer.*?\[Return to Day \d+\])" (:body response)))))
+        response (client/post url payload)]
+    ;main (extract-main (:body response))]
+    (re-seq #"^(.*answer.*)$" (:body response))))
