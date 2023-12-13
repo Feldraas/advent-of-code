@@ -87,6 +87,7 @@
                  :headers     {:Cookie     cookie
                                :User-Agent "Feldraas' AoC Clojure Library https://github.com/Feldraas/advent-of-code"}
                  :form-params {"level" (str part) "answer" (str answer)}}
-        response (client/post url payload)]
+        response (client/post url payload)
+        _ (println "Submitting answer" answer)]
     ;main (extract-main (:body response))]
     (re-seq #"^(.*answer.*)$" (:body response))))

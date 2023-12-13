@@ -102,3 +102,11 @@
        (take-while (complement condition))
        (last)
        (f)))
+
+(defn indices
+  ([coll]
+   (indices coll 0 0))
+  ([coll drop-start drop-end]
+   (->> (range (count coll))
+        (drop drop-start)
+        (drop-last drop-end))))
