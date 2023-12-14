@@ -110,3 +110,15 @@
    (->> (range (count coll))
         (drop drop-start)
         (drop-last drop-end))))
+
+(defn second-last
+  [coll]
+  (last (butlast coll)))
+
+(defn transpose
+  [list-of-seqs]
+  (let [transposed (->> list-of-seqs
+                        (apply mapv vector))]
+    (if (some string? list-of-seqs)
+      (map #(apply str %) transposed)
+      transposed)))
