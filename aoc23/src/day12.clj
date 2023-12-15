@@ -1,7 +1,7 @@
 (ns aoc23.src.day12
   (:require
     [aoc-tools :refer [read-input submit-answer]]
-    [utils :refer [extract-numbers]]
+    [utils :refer [extract-numbers indices]]
     [clojure.string :as str]
     [ysera.test :refer [is=]]))
 
@@ -145,7 +145,7 @@
 
 (defn try-whole
   [[rec groups]]
-  (if (= (count (filter #{\? \#} rec)) (min-size groups))
+  (if (= (count (filter #{\? \#} rec)) (apply + groups))
     ["" []]
     [rec groups]))
 
@@ -160,14 +160,18 @@
   [rec]
   (loop [rec rec]
     (let [first-pass (-> rec
-                         (str/replace "^??" "#.")
-                         (str/replace "??$" ".#")
+                         (str/replace #"^\?\?" "#.")
+                         (str/replace #"\?\?$" ".#")
                          (str/replace ".???." ".#.#.")
-                         (str/replace "???" ".#.")
+                         (str/replace-first "???" ".#.")
                          (str/replace ".??" ".#.")
                          (str/replace "??." ".#.")
                          (str/replace "#?#" "#.#")
-                         (str/replace "??" "#."))]
+                         (str/replace "??" "#.")
+                         (str/replace #"^\?$" "#")
+                         (str/replace #"^\?\." "#.")
+                         (str/replace #"\.\?$" ".#")
+                         (str/replace ".?." ".#."))]
       (if (= rec first-pass)
         rec
         (recur first-pass)))))
@@ -204,7 +208,7 @@
                            (subs start (min (count start) (+ idx size 1)) (count start))
                            end)
             bad       (map #(and (= (nth candidate %) \.) (= (nth rec %) \#))
-                           (range (count rec)))]
+                           (indices rec))]
         (if-not (some true? bad)
           candidate)))))
 
@@ -220,7 +224,8 @@
   (let [add-fn (if (= side :first)
                  add-first-group-at-idx
                  add-last-group-at-idx)]
-    (->> (range (count rec))
+    (->> rec
+         indices
          (map #(add-fn [rec groups] %))
          (remove nil?)
          (remove #(invalid? [% groups])))))
@@ -245,6 +250,13 @@
             (empty? groups))
       entry
       (simplify processed))))
+
+(defn correct?
+  [entry]
+  (= (exhaustive-search entry) (exhaustive-search (simplify entry))))
+
+(def wrong
+  (remove correct? real-input))
 
 (defn q-ways
   [[rec groups]]
@@ -283,6 +295,8 @@
       ;                                      (q-dot-ways [cleaned (butlast groups)])
       ;                                      (q-ways [cleaned (butlast groups)])))
       :else 0)))
+
+
 
 ;(defn num-ways
 ;  {:test (fn []
