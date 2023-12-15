@@ -3,8 +3,7 @@
     [utils :refer [extract-numbers parse-int]]
     [clj-http.client :as client]
     [clojure.string :as str]
-    [clojure.java.io :as io]
-    [blaster.clj-fstring :refer [f-str]]))
+    [clojure.java.io :as io]))
 
 (defn extract-example-text
   [body]
@@ -70,18 +69,10 @@
     (->> (with-open [rdr (io/reader path)]
            (mapv str (line-seq rdr))))))
 
-(defn extract-main
-  [text]
-  (->> text
-       (re-seq #"(?is)<main>\n (<[^ ]+?>)+(.*?)(<[^ ]+?>)+\n </main>")
-       (first)
-       (drop-last)
-       (last)))
-
 (defn submit-answer
   [part answer]
   (let [[year day] (get-year-and-day)
-        url      (f-str "https://adventofcode.com/20{year}/day/{day}/answer")
+        url      (str "https://adventofcode.com/20" year "/day/" day "/answer")
         cookie   (slurp "token.txt")
         payload  {:method      "POST"
                   :headers     {:Cookie     cookie
@@ -89,5 +80,4 @@
                   :form-params {"level" (str part) "answer" (str answer)}}
         response (client/post url payload)
         _        (println "Submitting answer" answer)]
-    ;main (extract-main (:body response))]
     (re-seq #"^(.*answer.*)$" (:body response))))
