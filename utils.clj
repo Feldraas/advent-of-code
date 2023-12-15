@@ -122,3 +122,12 @@
     (if (some string? list-of-seqs)
       (map #(apply str %) transposed)
       transposed)))
+
+(defn remove-first
+  [item-or-pred coll]
+  (let [pred (if (ifn? item-or-pred)
+               item-or-pred
+               #{item-or-pred})
+        [before after] (split-with (complement pred) coll)]
+    (concat before (rest after))))
+
