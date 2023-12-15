@@ -1,7 +1,7 @@
 (ns aoc23.src.day12
   (:require
     [aoc-tools :refer [read-input submit-answer]]
-    [utils :refer [extract-numbers remove-first unnil]]
+    [utils :refer [extract-numbers]]
     [clojure.string :as str]
     [ysera.test :refer [is=]]))
 

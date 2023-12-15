@@ -1,6 +1,4 @@
-(ns utils
-  (:require
-    [ysera.test :refer [is=]]))
+(ns utils)
 
 (defn parse-int [s]
   (if (= s "")
@@ -18,7 +16,6 @@
   (re-seq #"^-?\d+$" (str s)))
 
 (defn in?
-  "true if coll contains elm"
   [coll elm]
   (some #(= elm %) coll))
 
@@ -58,12 +55,6 @@
   [arg f & args]
   (apply f (concat args [arg])))
 
-(defn unnil
-  [x val]
-  (if (nil? x)
-    val
-    x))
-
 (defn filter-keys
   [f m]
   (->> m
@@ -77,11 +68,6 @@
        (into {})))
 
 (defn mfilter
-  {:test (fn []
-           (is= (mfilter :keys even? {1 :a 2 :b 3 :c 4 :d})
-                {2 :b 4 :d})
-           (is= (mfilter :vals even? {:a 2 :b 3 :c 4 :d 1})
-                {:a 2 :c 4}))}
   ([f m]
    (mfilter :keys f m))
   ([by f m]
