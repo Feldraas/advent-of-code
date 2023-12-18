@@ -1,9 +1,10 @@
 (ns utils)
 
 (defn parse-int [s]
-  (if (= s "")
-    0
-    (Integer/parseInt s)))
+  (cond
+    (char? s) (Integer/parseInt (str s))
+    (= s "") 0
+    :else (Integer/parseInt s)))
 
 (defn extract-numbers
   [string]
