@@ -118,3 +118,9 @@
         [before after] (split-with (complement pred) coll)]
     (concat before (rest after))))
 
+(defn sgn
+  [x]
+  (cond
+    (pos? x) 1
+    (neg? x) -1
+    :else 0))
