@@ -80,4 +80,4 @@
                   :form-params {"level" (str part) "answer" (str answer)}}
         response (client/post url payload)
         _        (println "Submitting answer" answer)]
-    (re-seq #"^(.*answer.*)$" (:body response))))
+    (re-seq #"(?is).{20}answer.{50}" (:body response))))
