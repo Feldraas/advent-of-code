@@ -1,9 +1,9 @@
 (ns aoc-tools
   (:require
-    [utils :refer [extract-numbers parse-int]]
-    [clj-http.client :as client]
-    [clojure.string :as str]
-    [clojure.java.io :as io]))
+   [utils :refer [extract-numbers parse-int]]
+   [clj-http.client :as client]
+   [clojure.string :as str]
+   [clojure.java.io :as io]))
 
 (defn extract-example-text
   [body]
@@ -23,8 +23,8 @@
         example-text   (extract-example-text (:body base-response))
         input-response (client/get input-url payload)
         input-text     (:body input-response)]
-    [(str/replace example-text "\n" "\r\n")
-     (str/replace input-text "\n" "\r\n")]))
+    [example-text input-text]))
+
 
 (defn create-files
   ([day]
@@ -45,11 +45,11 @@
      (do
        (spit (str input-path "day" day ".ex") example-text)
        (spit (str input-path "day" day ".txt") input-text)
-       (spit (str src-path "day" day ".clj") (str "(ns aoc" year ".src.day" day "\r\n"
-                                                  "  (:require \r\n"
-                                                  "    [aoc-tools :refer [read-input submit-answer]]))\r\n\r\n"
-                                                  "(def input (read-input :test))\r\n"
-                                                  "(def real-input (read-input))\r\n\r\n"))))))
+       (spit (str src-path "day" day ".clj") (str "(ns aoc" year ".src.day" day "\n"
+                                                  "  (:require \n"
+                                                  "    [aoc-tools :refer [read-input submit-answer]]))\n\n"
+                                                  "(def input (read-input :test))\n"
+                                                  "(def real-input (read-input))\n\n"))))))
 
 (defn get-year-and-day
   []
