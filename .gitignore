@@ -4,3 +4,6 @@
 advent-of-code.iml
 **/test.txt
 token.txt
+.lsp/
+.clj-kondo/
+.calva/
