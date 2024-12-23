@@ -24,9 +24,9 @@
   [n [x y]]
   (case n
     4 (list [(inc x) y] [(dec x) y] [x (inc y)] [x (dec y)])
-    5 (conj (get-adjacent [x y] 4) [x y])
-    8 (concat (get-adjacent [x y] 4) [[(inc x) (inc y)] [(inc x) (dec y)] [(dec x) (inc y)] [(dec x) (dec y)]])
-    9 (conj (get-adjacent [x y] 8) [x y])))
+    5 (conj (get-adjacent 4 [x y]) [x y])
+    8 (concat (get-adjacent 4 [x y]) [[(inc x) (inc y)] [(inc x) (dec y)] [(dec x) (inc y)] [(dec x) (dec y)]])
+    9 (conj (get-adjacent 8 [x y]) [x y])))
 
 (defn non-neg?
   [x]

@@ -14,7 +14,7 @@
 
 (defn fetch-input
   [year day]
-  (let [base-url       (str "https://adventofcode.com/20" year "/day/" day)
+  (let [base-url       (str "https://adventofcode.com/20" year "/day/" (read-string day))
         input-url      (str base-url "/input")
         cookie         (slurp "token.txt")
         payload        {:headers {:Cookie     cookie
@@ -39,6 +39,7 @@
 
   ([year day]
    (let [year       (mod year 2000)
+         day        (format "%02d" day)
          input-path (str "aoc" year "/inputs/")
          src-path   (str "aoc" year "/src/")
          [example-text input-text] (fetch-input year day)]
@@ -47,7 +48,7 @@
        (spit (str input-path "day" day ".txt") input-text)
        (spit (str src-path "day" day ".clj") (str "(ns aoc" year ".src.day" day "\n"
                                                   "  (:require \n"
-                                                  "    [aoc-tools :refer [read-input submit-answer]]))\n\n"
+                                                  "   [aoc-tools :refer [read-input submit-answer]]))\n\n"
                                                   "(def input (read-input :test))\n"
                                                   "(def real-input (read-input))\n\n"))))))
 
@@ -55,7 +56,8 @@
   []
   (let [[project _ file] (str/split (str *ns*) #"\.")
         year (first (extract-numbers project))
-        day  (first (extract-numbers file))]
+        day  (first (extract-numbers file))
+        day  (format "%02d" day)]
     [year day]))
 
 (defn read-input
@@ -71,13 +73,14 @@
 
 (defn submit-answer
   [part answer]
-  (let [[year day] (get-year-and-day)
-        url      (str "https://adventofcode.com/20" year "/day/" day "/answer")
+  (let [_ (println "Submitting answer" answer)
+        [year day] (get-year-and-day)
+        url      (str "https://adventofcode.com/20" year "/day/" (read-string day) "/answer")
         cookie   (slurp "token.txt")
         payload  {:method      "POST"
                   :headers     {:Cookie     cookie
                                 :User-Agent "Feldraas' AoC Clojure Library https://github.com/Feldraas/advent-of-code"}
                   :form-params {"level" (str part) "answer" (str answer)}}
-        response (client/post url payload)
-        _        (println "Submitting answer" answer)]
+        response (client/post url payload)]
     (re-seq #"(?is).{20}answer.{50}" (:body response))))
+
