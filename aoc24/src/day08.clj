@@ -44,7 +44,7 @@
       (get-line a1 diff size))))
 
 ;; Part 1
-(let [input input
+(let [input real-input
       size (count input)]
   (->> input
        (get-antennas)

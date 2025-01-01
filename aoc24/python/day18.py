@@ -6,7 +6,7 @@ with open("aoc24/inputs/day18.txt") as f:
 
 border = 70
 
-for number in [1024, 3036]:
+for number in [1024, *range(len(walls), 1024, -1)]:
     nodes = []
     best_score = defaultdict(lambda: float("inf"))
     previous = defaultdict(set)
@@ -47,6 +47,6 @@ for number in [1024, 3036]:
     path_length = best_score[exit]
     if number == 1024:
         print("Part 1:", path_length)
-    elif path_length == float("inf"):
-        print("Part 2:", walls[number - 1])
+    elif path_length != float("inf"):
+        print("Part 2:", walls[number])
         break

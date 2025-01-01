@@ -28,6 +28,7 @@
            (and
             ;; false  ;; Uncomment for part 1
             (str/ends-with? (str result) (str (last numbers)))
+            (not= (str result) (str (last numbers)))
             (achievable? (conj (butlast numbers) (unconcat result (last numbers))))))))
 
 (->> real-input
